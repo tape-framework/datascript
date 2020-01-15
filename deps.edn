@@ -1,0 +1,2 @@
+{:deps {datascript {:mvn/version "0.18.7"}
+        tape/mvc {:local/root "../mvc"}}}

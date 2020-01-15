@@ -1,0 +1,6 @@
+{:tape.datascript.controller/schema [:tape/const]
+
+ :tape.datascript.controller/add    [:tape.mvc.controller/cofx]
+ :tape.datascript.controller/set    [:tape.mvc.controller/fx]
+ :tape.datascript.controller/load   [:tape.mvc.controller/fx]
+ :tape.datascript.controller/dump   [:tape.mvc.controller/fx]}
