@@ -30,14 +30,14 @@ tape/datascript {:local/root "../datascript"}
 In `config.edn` add `:tape.datascript.controller/module` (and your schema, if
 any):
 
-```cljs
+```clojure
 {:tape.profile/base {:tape.datascript.controller/schema <<schema-map>>}
  :tape.datascript.controller/module nil}
 ```
 
 For less verbose destructure calls, require in your ns:
 
-```cljs
+```clojure
 (ns sample.app.some.controller
   (:require [tape.datascript.controller :as datascript.c]))
 ```
@@ -47,7 +47,7 @@ For less verbose destructure calls, require in your ns:
 In fx handlers that use it, add it to the interceptor chain via metadata and use
 the `ds` coeffect and effect:
 
-```cljs
+```clojure
 (defn save
   {::c/event-fx true
    ::c/interceptors [datascript.c/inject]}
@@ -59,7 +59,7 @@ the `ds` coeffect and effect:
 If all the handlers in the namespace will require it, you can add the
 interceptor as metadata at the namespace level:
 
-```cljs
+```clojure
 (ns sample.app.some.controller
   "Some docstring."
   {:tape.mvc.controller/interceptors [datascript.c/inject]}
