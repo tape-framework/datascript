@@ -35,14 +35,14 @@ any):
  :tape.datascript.controller/module nil}
 ```
 
+##### Interceptor & Co/Effect
+
 For less verbose destructure calls, require in your ns:
 
 ```clojure
 (ns sample.app.some.controller
   (:require [tape.datascript.controller :as datascript.c]))
 ```
-
-##### Interceptor & Co/Effect
 
 In fx handlers that use it, add it to the interceptor chain via metadata and use
 the `ds` coeffect and effect:
@@ -66,10 +66,14 @@ interceptor as metadata at the namespace level:
   (:require [tape.datascript.controller :as datascript.c]))
 ```
 
+If you used it akin to app-db, the equivalent of `re-frame.db/app-db` is
+`tape.datascript.controller/ds` and you can build a signal graph on it via
+`re-frame.core/reg-sub-raw`.
+
 ##### LocalStorage
 
 The `{::datascript.c/load true}` and `{::datascript.c/dump true}` effects can
-be used to load and dump the DataScript DB to LocalStorage.
+be used to load and dump the DataScript DB from and to LocalStorage.
 
 #### License
 
