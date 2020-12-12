@@ -1,2 +1,2 @@
-{:deps {datascript {}
-        tape/mvc   {:local/root "../mvc"}}}
+{:deps {datascript/datascript {}
+        tape/mvc              {:local/root "../mvc"}}}
