@@ -12,17 +12,22 @@
 
 (module/load-hierarchy)
 
-(defn ^::c/event-fx load [_ _]
-  {::datascript.c/load true})
+(defn load
+  {::c/reg ::c/event-fx}
+  [_ _] {::datascript.c/load true})
 
-(defn ^::c/event-fx addx [{::datascript.c/keys [ds]} _]
+(defn addx
+  {::c/reg ::c/event-fx}
+  [{::datascript.c/keys [ds]} _]
   {::datascript.c/ds (d/db-with ds [{::x 42}])})
 
-(defn ^::c/event-fx dump [_ _]
-  {::datascript.c/dump true})
+(defn dump
+  {::c/reg ::c/event-fx}
+  [_ _] {::datascript.c/dump true})
 
-(defn ^::c/sub-raw query [_ _]
-  (d/q '[:find ?x . :where [_ ::x ?x]] @datascript.c/ds))
+(defn query
+  {::c/reg ::c/sub-raw}
+  [_ _] (d/q '[:find ?x . :where [_ ::x ?x]] @datascript.c/ds))
 
 (c/defmodule)
 

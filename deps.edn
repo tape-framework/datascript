@@ -1,2 +1,4 @@
 {:deps {datascript/datascript {}
-        tape/mvc              {:local/root "../mvc"}}}
+        tape/mvc              {:local/root "../mvc"}}
+ :aliases {:test {:extra-paths ["test" "target"]
+                  :extra-deps  {tape/dev {:local/root "../dev"}}}}}

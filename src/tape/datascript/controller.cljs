@@ -1,12 +1,12 @@
 (ns tape.datascript.controller
   (:refer-clojure :exclude [set])
   (:require [clojure.edn :as edn]
+            [integrant.core :as ig]
             [datascript.core :as d]
             [reagent.core :as r]
             [re-frame.cofx :as cofx]
-            [tape.mvc.controller :as c :include-macros true]
-            [integrant.core :as ig]
-            [tape.module :as module]))
+            [tape.module :as module]
+            [tape.mvc.controller :as c :include-macros true]))
 
 ;;; Data
 
@@ -27,16 +27,23 @@
 
 ;;; Cofx
 
-(defn ^{::c/cofx ::ds} add [m] (assoc m ::ds @ds))
+(defn add
+  {::c/reg ::c/cofx
+   ::c/id ::ds}
+  [m] (assoc m ::ds @ds))
 
 (def inject (cofx/inject-cofx ::ds))
 
 ;;; Fx
 
-(defn ^{::c/fx ::ds} set [v]
-  (when-not (identical? @ds v) (reset! ds v)))
+(defn set
+  {::c/reg ::c/fx
+   ::c/id ::ds}
+  [v] (when-not (identical? @ds v) (reset! ds v)))
 
-(defn ^::c/fx dump [] (dump-local @ds))
+(defn dump
+  {::c/reg ::c/fx}
+  [] (dump-local @ds))
 
 ;;; Integrant
 
@@ -52,4 +59,4 @@
                                   ::add     #'add
                                   ::set     #'set
                                   ::load    (ig/ref ::load-fn)
-                                  ::dump    dump})))
+                                  ::dump    #'dump})))
