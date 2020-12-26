@@ -1,62 +1,82 @@
 (ns tape.datascript.controller
-  (:refer-clojure :exclude [set])
+  (:refer-clojure :exclude [set key])
   (:require [clojure.edn :as edn]
             [integrant.core :as ig]
             [datascript.core :as d]
             [reagent.core :as r]
-            [re-frame.cofx :as cofx]
-            [tape.module :as module]
+            [re-frame.core :as rf]
             [tape.mvc.controller :as c :include-macros true]))
 
-;;; Data
+;;; Helpers
 
-;; db moniker is already established in re-frame, so we use `ds` to simplify
-;; code on destructuring calls
-(def ^:private key-name (-> ::ds symbol str))
-
-(defn load-local []
-  (when-let [s (js/localStorage.getItem key-name)]
+(defn load-local
+  [key]
+  (when-let [s (js/localStorage.getItem key)]
     (edn/read-string s)))
 
-(defn dump-local [ds]
-  (js/localStorage.setItem key-name (pr-str ds)))
+(defn dump-local
+  [key ds]
+  (js/localStorage.setItem key (pr-str ds)))
 
 ;;; DB
 
-(defonce ds (r/atom nil))
+;; db moniker is already established in re-frame, so we use `ds` to simplify
+;; code on destructuring calls
+(def key (-> ::ds symbol str))
 
-;;; Cofx
+(def ^{::c/reg :tape/const} schema {})
 
-(defn add
-  {::c/reg ::c/cofx
-   ::c/id ::ds}
-  [m] (assoc m ::ds @ds))
+(def ^{::c/reg :tape/const} ds
+  (r/atom (d/empty-db) :meta {:listeners (atom {})}))
 
-(def inject (cofx/inject-cofx ::ds))
+;;; Handlers
 
-;;; Fx
+(defmethod ig/init-key ::add [_ ds]
+  ;; Workaround for: https://ask.clojure.org/index.php/8975
+  (let [add ^{::c/id ::ds}
+        (fn [m] (assoc m ::ds @ds))]
+    add))
 
-(defn set
-  {::c/reg ::c/fx
-   ::c/id ::ds}
-  [v] (when-not (identical? @ds v) (reset! ds v)))
+(def inject (rf/inject-cofx ::ds))
+
+(defmethod ig/init-key ::set [_ ds]
+  ;; Workaround for: https://ask.clojure.org/index.php/8975
+  (let [set
+        ^{::c/id ::ds}
+        (fn [v]
+          (when-not (identical? @ds v)
+            (reset! ds v)))]
+    set))
+
+(defmethod ig/init-key ::load-fx [_ {:keys [key schema ds]}]
+  ;; Workaround for: https://ask.clojure.org/index.php/8975
+  (let [load ^{::c/id ::load}
+        (fn []
+          (reset! ds (or (load-local key)
+                         (d/empty-db schema))))]
+    load))
+
+(defmethod ig/init-key ::dump-fx [_ {:keys [key ds]}]
+  ;; Workaround for: https://ask.clojure.org/index.php/8975
+  (let [dump ^{::c/id ::dump}
+        (fn [] (dump-local key @ds))]
+    dump))
+
+(defn load
+  {::c/reg ::c/event-fx}
+  [_ _] {::load true})
 
 (defn dump
-  {::c/reg ::c/fx}
-  [] (dump-local @ds))
-
-;;; Integrant
-
-(defmethod ig/init-key ::load-fn [_ {:keys [schema]}]
-  (fn [] (reset! ds (or (load-local) (d/empty-db schema)))))
+  {::c/reg ::c/event-fx}
+  [_ _] {::dump true})
 
 ;;; Module
 
-(defmethod ig/init-key ::module [_ _]
-  (fn [config]
-    (module/merge-configs config {::schema  nil             ;; provided
-                                  ::load-fn {:schema (ig/ref ::schema)}
-                                  ::add     #'add
-                                  ::set     #'set
-                                  ::load    (ig/ref ::load-fn)
-                                  ::dump    #'dump})))
+(c/defmodule {::key key
+              ::add (ig/ref ::ds)
+              ::set (ig/ref ::ds)
+              ::load-fx {:key (ig/ref ::key)
+                         :schema (ig/ref ::schema)
+                         :ds (ig/ref ::ds)}
+              ::dump-fx {:key (ig/ref ::key)
+                         :ds (ig/ref ::ds)}})
