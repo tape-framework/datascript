@@ -49,11 +49,10 @@ the `ds` coeffect and effect:
 
 ```clojure
 (defn save
-  {::c/event-fx true
+  {::c/reg ::c/event-fx
    ::c/interceptors [datascript.c/inject]}
   [{::datascript.c/keys [ds]} params]
-  (let [ds' (d/db-with ds (make-tx-data params))]
-    {::datascript.c/ds ds'}))
+  {::datascript.c/ds (d/db-with ds (some-model/make-tx-data params))})
 ```
 
 If all the handlers in the namespace will require it, you can add the
@@ -67,13 +66,14 @@ interceptor as metadata at the namespace level:
 ```
 
 If you used it akin to app-db, the equivalent of `re-frame.db/app-db` is
-`tape.datascript.controller/ds` and you can build a signal graph on it via
-`re-frame.core/reg-sub-raw`.
+`:tape.datascript.controller/ds` entry in the system map and you can build a
+signal graph on it via `re-frame.core/reg-sub-raw`.
 
 ##### LocalStorage
 
-The `{::datascript.c/load true}` and `{::datascript.c/dump true}` effects can
-be used to load and dump the DataScript DB from and to LocalStorage.
+The `{::datascript.c/load true}` and `{::datascript.c/dump true}` effects or
+`[::datascript.c/load]` and `[::datascript.c/dump]` events can be used to load
+and dump the DataScript DB from and to LocalStorage.
 
 #### License
 
