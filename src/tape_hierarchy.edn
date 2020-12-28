@@ -1,5 +1,6 @@
-#:tape.datascript.controller{:key [:tape/const]
-                             :add [:tape.mvc.controller/cofx]
-                             :set [:tape.mvc.controller/fx]
-                             :load-fx [:tape.mvc.controller/fx]
-                             :dump-fx [:tape.mvc.controller/fx]}
+#:tape.datascript.controller
+    {:key [:tape/const]
+     :add [:tape.mvc/cofx]
+     :set [:tape.mvc/fx]
+     :load-fx [:tape.mvc/fx]
+     :dump-fx [:tape.mvc/fx]}
