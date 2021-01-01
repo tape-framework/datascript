@@ -1,8 +1,8 @@
 == README
 
-=== About
+`tape.datascript`
 
-`tape.datascript.controller`
+=== About
 
 Integrates the https://github.com/tonsky/datascript[datascript] data
 structure via a `tape.mvc.controller` module, and provides co/effects to
@@ -37,7 +37,7 @@ any):
  :tape.datascript.controller/module nil}
 ----
 
-##### Interceptor & Co/Effect
+==== Interceptor & Co/Effect
 
 For less verbose destructure calls, require in your ns:
 
